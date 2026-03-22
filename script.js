@@ -108,7 +108,7 @@ function calculateAndShow() {
     }
   });
 
-  // Call the AI function from the other file (if it exists)
+  // Call AI if available
   if (typeof addGroqFeedback === "function") {
     addGroqFeedback(subjects, marks, average);
   }
