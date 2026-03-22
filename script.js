@@ -108,8 +108,10 @@ function calculateAndShow() {
     }
   });
 
-  // Call AI if available
+  // Safe call to AI function from Ai.js
   if (typeof addGroqFeedback === "function") {
     addGroqFeedback(subjects, marks, average);
+  } else {
+    console.log("Ai.js not loaded or function missing");
   }
 }
