@@ -1,3 +1,4 @@
+alert("script.js loaded!");
 let barChartInstance = null;
 let pieChartInstance = null;
 
