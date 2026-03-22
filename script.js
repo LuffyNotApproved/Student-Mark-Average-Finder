@@ -109,4 +109,11 @@ function calculateAndShow() {
       plugins: { title: { display: true, text: `Overall Performance (${average.toFixed(1)}%)` } }
     }
   });
+  // Pie Chart code here...
+
+  // Call AI after charts
+  if (typeof addGroqFeedback === "function") {
+    addGroqFeedback(subjects, marks, average);
+  }
+}
 }
