@@ -1,3 +1,6 @@
+console.log("script.js fully executed – functions should be available now");
+// alert("script.js loaded and ran successfully!"); // uncomment if you want debug alert
+
 let barChartInstance = null;
 let pieChartInstance = null;
 
@@ -82,8 +85,8 @@ function calculateAndShow() {
       datasets: [{
         label: "Marks",
         data: marks,
-        backgroundColor: "rgba(75, 192, 192, 0.7)",
-        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(255, 235, 59, 0.7)", // yellow bars
+        borderColor: "#ffeb3b",
         borderWidth: 1
       }]
     },
@@ -100,7 +103,7 @@ function calculateAndShow() {
       labels: ["Achieved", "Remaining to 100%"],
       datasets: [{
         data: [average, 100 - average],
-        backgroundColor: ["#36A2EB", "#FF6384"]
+        backgroundColor: ["#ffeb3b", "#333333"] // yellow + dark
       }]
     },
     options: {
@@ -108,10 +111,50 @@ function calculateAndShow() {
     }
   });
 
-  console.log("Is addGroqFeedback available?", typeof addGroqFeedback);
+  // ================================================
+  // SPECIAL AI TIP BOX – always appears on page
+  // ================================================
+  const aiTipBox = document.createElement("div");
+  aiTipBox.className = "ai-tip-box"; // uses the CSS class from style.css
 
-  // Call AI after charts
-  if (typeof addGroqFeedback === "function") {
-    addGroqFeedback(subjects, marks, average);
-  }
-}  
+  let tipHTML = `
+    <strong>🌟 Groq AI Study Tip</strong><br><br>
+    Loading advice from Groq...
+  `;
+
+  // Try real Groq
+  (async () => {
+    try {
+      const prompt = `Student marks: \( {subjects.map((s, i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis. Be encouraging.`;
+
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer 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`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama3-70b-8192",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7,
+          max_tokens: 180
+        })
+      });
+
+      if (!response.ok) throw new Error("Groq error " + response.status);
+
+      const data = await response.json();
+      const aiText = data.choices[0].message.content;
+      aiTipBox.innerHTML = `<strong>🌟 Groq AI Advice:</strong><br><br>${aiText.replace(/\n/g, "<br>")}`;
+    } catch (e) {
+      aiTipBox.innerHTML = `
+        <strong>🌟 AI Tip (Quick Mode):</strong><br><br>
+        Your average is ${average.toFixed(1)}% — solid work!<br>
+        Focus extra on your lowest subject and you'll hit 90+ soon! 💪🚀
+      `;
+    }
+  })();
+
+  document.getElementById("result").appendChild(aiTipBox);
+  // ================================================
+}
