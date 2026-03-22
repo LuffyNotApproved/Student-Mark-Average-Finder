@@ -110,11 +110,11 @@ function calculateAndShow() {
     }
   });
   // Pie Chart code here...
+  console.log("Is addGroqFeedback available?", typeof addGroqFeedback);
 
   // Call AI after charts
   if (typeof addGroqFeedback === "function") {
     addGroqFeedback(subjects, marks, average);
   }
-  console.log("Is addGroqFeedback available?", typeof addGroqFeedback);
-}
+ }
 }
