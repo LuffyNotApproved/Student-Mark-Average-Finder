@@ -1,10 +1,10 @@
-// ai-feedback.js — completely separate from the main logic
+// Ai.js - cleaned and syntactically correct
 
 async function addGroqFeedback(subjects, marks, average) {
   const GROQ_API_KEY = "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";
 
   try {
-    const prompt = `Student marks: \( {subjects.map((s,i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis. Be encouraging.`;
+    const prompt = `Student marks: \( {subjects.map((s, i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis. Be encouraging.`;
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -21,7 +21,7 @@ async function addGroqFeedback(subjects, marks, average) {
     });
 
     if (!response.ok) {
-      throw new Error(`Groq API returned ${response.status}`);
+      throw new Error(`Groq API returned status ${response.status}`);
     }
 
     const data = await response.json();
@@ -36,15 +36,10 @@ async function addGroqFeedback(subjects, marks, average) {
       text-align: left;
       color: white;
     `;
-    aiBox.innerHTML = `<strong>🌟 Groq AI (Llama 3.3) Feedback:</strong><br><br>${aiText}`;
+    aiBox.innerHTML = `<strong>🌟 Groq AI Feedback:</strong><br><br>${aiText}`;
     document.getElementById("result").appendChild(aiBox);
 
   } catch (error) {
     console.error("Groq AI failed (main app continues normally):", error);
-    // Optional: silent fallback text
-    // const small = document.createElement("small");
-    // small.textContent = "AI feedback unavailable";
-    // small.style.color = "#aaa";
-    // document.getElementById("result").appendChild(small);
   }
 }
