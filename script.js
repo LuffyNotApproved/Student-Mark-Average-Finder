@@ -41,33 +41,132 @@ function calculateAndShow() {
     if (!markStr || isNaN(mark) || mark < 0 || mark > 100) {
       valid = false;
       break;
-    // Code for Actual AI feedback
-const GEMINI_KEY = "AIzaSyAbb_j0igY4woK05T0Mt2q9eZQv0mFuU6I";
+    }
 
-async function getRealAIFeedback() {
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: `Student marks: \( {subjects.map((s,i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational study advice in 4-5 lines.`
-        }]
+    subjects.push(subName);
+    marks.push(mark);
+    total += mark;
+  }
+
+  if (!valid || marks.length === 0) {
+    alert("Please fill all marks correctly (0–100).");
+    return;
+  }
+
+  const count = marks.length;
+  const average = total / count;
+
+  // Performance message
+  let message = "";
+  if (average >= 90) message = "Outstanding! 🌟";
+  else if (average >= 80) message = "Very Good! 👍";
+  else if (average >= 70) message = "Good 👌";
+  else if (average >= 60) message = "Average";
+  else if (average >= 50) message = "Needs Improvement ⚠️";
+  else message = "Requires serious effort ❗";
+
+  // Show result
+  document.getElementById("summary").innerHTML = 
+    `Total subjects: ${count}<br>Total marks: ${total.toFixed(1)}<br>Average: ${average.toFixed(2)}%`;
+  document.getElementById("performance").innerHTML = message;
+
+  document.getElementById("result").style.display = "block";
+  document.querySelector(".charts").style.display = "flex";
+
+  // Destroy previous charts
+  if (barChartInstance) barChartInstance.destroy();
+  if (pieChartInstance) pieChartInstance.destroy();
+
+  // Bar Chart
+  const ctxBar = document.getElementById("barChart").getContext("2d");
+  barChartInstance = new Chart(ctxBar, {
+    type: "bar",
+    data: {
+      labels: subjects,
+      datasets: [{
+        label: "Marks",
+        data: marks,
+        backgroundColor: "rgba(75, 192, 192, 0.7)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 1
       }]
-    })
+    },
+    options: {
+      scales: { y: { beginAtZero: true, max: 100 } },
+      plugins: { title: { display: true, text: "Subject-wise Marks" } }
+    }
   });
 
-  const data = await response.json();
-  const aiText = data.candidates[0].content.parts[0].text;
+  // Pie Chart
+  const ctxPie = document.getElementById("pieChart").getContext("2d");
+  pieChartInstance = new Chart(ctxPie, {
+    type: "pie",
+    data: {
+      labels: ["Achieved", "Remaining to 100%"],
+      datasets: [{
+        data: [average, 100 - average],
+        backgroundColor: ["#36A2EB", "#FF6384"]
+      }]
+    },
+    options: {
+      plugins: { title: { display: true, text: `Overall Performance (${average.toFixed(1)}%)` } }
+    }
+  });
 
-  const aiBox = document.createElement("div");
-  aiBox.innerHTML = `<strong>🌟 Real Gemini AI Feedback:</strong><br>${aiText}`;
-  aiBox.style.cssText = "margin-top:20px;padding:15px;background:rgba(255,255,255,0.2);border-radius:12px;color:white;";
-  document.getElementById("result").appendChild(aiBox);
+  // ============== 🌟 GROQ AI (Real Llama 3.3) ==============
+  const GROQ_API_KEY = "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";
+
+  async function getGroqAI() {
+    try {
+      const prompt = `Student marks: \( {subjects.map((s,i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. 
+Give short, motivational, personalised study advice in 4-5 lines. Use emojis. Be encouraging.`;
+
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${GROQ_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7,
+          max_tokens: 180
+        })
+      });
+
+      const data = await response.json();
+      const aiText = data.choices[0].message.content;
+
+      const aiBox = document.createElement("div");
+      aiBox.style.cssText = `
+        margin-top: 25px; 
+        padding: 18px; 
+        background: rgba(255,255,255,0.15); 
+        border-radius: 12px; 
+        text-align: left; 
+        color: white;
+      `;
+      aiBox.innerHTML = `<strong>🌟 Groq AI (Llama 3.3) Feedback:</strong><br><br>${aiText}`;
+      document.getElementById("result").appendChild(aiBox);
+
+    } catch (error) {
+      console.log("Groq AI error:", error);
+    }
+  }
+
+  // Run Groq AI after everything is ready
+  getGroqAI();
+  }    aiBox.innerHTML = `<strong>🌟 Groq AI (Llama 3.3) Feedback:</strong><br><br>${aiText}`;
+    document.getElementById("result").appendChild(aiBox);
+
+  } catch (error) {
+    console.log("Groq AI error:", error);
+  }
 }
 
-// Call it after charts
-getRealAIFeedback();
+// Run AI after charts
+getGroqAI();
     }
 
     subjects.push(subName);
