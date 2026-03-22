@@ -41,6 +41,33 @@ function calculateAndShow() {
     if (!markStr || isNaN(mark) || mark < 0 || mark > 100) {
       valid = false;
       break;
+    // Code for Actual AI feedback
+const GEMINI_KEY = "AIzaSyAbb_j0igY4woK05T0Mt2q9eZQv0mFuU6I";
+
+async function getRealAIFeedback() {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{
+        parts: [{
+          text: `Student marks: \( {subjects.map((s,i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational study advice in 4-5 lines.`
+        }]
+      }]
+    })
+  });
+
+  const data = await response.json();
+  const aiText = data.candidates[0].content.parts[0].text;
+
+  const aiBox = document.createElement("div");
+  aiBox.innerHTML = `<strong>🌟 Real Gemini AI Feedback:</strong><br>${aiText}`;
+  aiBox.style.cssText = "margin-top:20px;padding:15px;background:rgba(255,255,255,0.2);border-radius:12px;color:white;";
+  document.getElementById("result").appendChild(aiBox);
+}
+
+// Call it after charts
+getRealAIFeedback();
     }
 
     subjects.push(subName);
