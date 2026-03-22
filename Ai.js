@@ -1,4 +1,4 @@
-// Ai.js - cleaned and syntactically correct
+// Ai.js – isolated AI logic
 
 async function addGroqFeedback(subjects, marks, average) {
   const GROQ_API_KEY = "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";
@@ -21,25 +21,18 @@ async function addGroqFeedback(subjects, marks, average) {
     });
 
     if (!response.ok) {
-      throw new Error(`Groq API returned status ${response.status}`);
+      throw new Error(`Groq status: ${response.status}`);
     }
 
     const data = await response.json();
     const aiText = data.choices?.[0]?.message?.content || "No advice received from AI.";
 
     const aiBox = document.createElement("div");
-    aiBox.style.cssText = `
-      margin-top: 25px;
-      padding: 18px;
-      background: rgba(255,255,255,0.15);
-      border-radius: 12px;
-      text-align: left;
-      color: white;
-    `;
+    aiBox.style.cssText = "margin-top:25px; padding:18px; background:rgba(255,255,255,0.15); border-radius:12px; text-align:left; color:white;";
     aiBox.innerHTML = `<strong>🌟 Groq AI Feedback:</strong><br><br>${aiText}`;
     document.getElementById("result").appendChild(aiBox);
 
   } catch (error) {
-    console.error("Groq AI failed (main app continues normally):", error);
+    console.error("Groq AI failed (main app continues):", error);
   }
 }
