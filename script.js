@@ -1,6 +1,3 @@
-console.log("script.js fully executed – functions should be available now");
-alert("script.js loaded and ran successfully!");
-
 let barChartInstance = null;
 let pieChartInstance = null;
 
