@@ -107,11 +107,4 @@ function calculateAndShow() {
       plugins: { title: { display: true, text: `Overall Performance (${average.toFixed(1)}%)` } }
     }
   });
-
-  // Safe call to AI function from Ai.js
-  if (typeof addGroqFeedback === "function") {
-    addGroqFeedback(subjects, marks, average);
-  } else {
-    console.log("Ai.js not loaded or function missing");
-  }
 }
