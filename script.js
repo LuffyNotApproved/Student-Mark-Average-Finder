@@ -1,5 +1,6 @@
 console.log("script.js fully executed – functions should be available now");
 alert("script.js loaded and ran successfully!");
+
 let barChartInstance = null;
 let pieChartInstance = null;
 
@@ -109,12 +110,11 @@ function calculateAndShow() {
       plugins: { title: { display: true, text: `Overall Performance (${average.toFixed(1)}%)` } }
     }
   });
-  // Pie Chart code here...
+
   console.log("Is addGroqFeedback available?", typeof addGroqFeedback);
 
   // Call AI after charts
   if (typeof addGroqFeedback === "function") {
     addGroqFeedback(subjects, marks, average);
   }
- }
-}
+}  
