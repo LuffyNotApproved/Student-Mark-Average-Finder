@@ -1,7 +1,7 @@
-// Ai.js – isolated AI logic
+// Ai.js - Groq AI feedback (won't crash main app if fails)
 
 async function addGroqFeedback(subjects, marks, average) {
-  const GROQ_API_KEY = "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";
+  const GROQ_API_KEY = "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";  // Your key
 
   try {
     const prompt = `Student marks: \( {subjects.map((s, i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis. Be encouraging.`;
@@ -21,18 +21,30 @@ async function addGroqFeedback(subjects, marks, average) {
     });
 
     if (!response.ok) {
-      throw new Error(`Groq status: ${response.status}`);
+      throw new Error(`Groq error: ${response.status}`);
     }
 
     const data = await response.json();
     const aiText = data.choices?.[0]?.message?.content || "No advice received from AI.";
 
     const aiBox = document.createElement("div");
-    aiBox.style.cssText = "margin-top:25px; padding:18px; background:rgba(255,255,255,0.15); border-radius:12px; text-align:left; color:white;";
+    aiBox.style.cssText = `
+      margin-top: 25px;
+      padding: 18px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 12px;
+      text-align: left;
+      color: white;
+    `;
     aiBox.innerHTML = `<strong>🌟 Groq AI Feedback:</strong><br><br>${aiText}`;
     document.getElementById("result").appendChild(aiBox);
 
   } catch (error) {
-    console.error("Groq AI failed (main app continues):", error);
+    console.error("Groq AI failed (main calculator still works):", error);
+    // Optional fallback text
+    const fallback = document.createElement("p");
+    fallback.style.color = "#ffcc00";
+    fallback.textContent = "AI feedback unavailable right now.";
+    document.getElementById("result").appendChild(fallback);
   }
 }
