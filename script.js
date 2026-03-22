@@ -88,28 +88,5 @@ function calculateAndShow() {
     options: { plugins: { title: { display: true, text: `Overall Performance (${average.toFixed(1)}%)` } } }
   });
 
-  // ============== 🌟 GROQ AI (Real Llama 3.3) ==============
-  const GROQ_API_KEY = "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";
-
-  async function getGroqAI() {
-    try {
-      const prompt = `Student marks: \( {subjects.map((s,i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis. Be encouraging.`;
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }], temperature: 0.7, max_tokens: 180 })
-      });
-      const data = await response.json();
-      const aiText = data.choices[0].message.content;
-
-      const aiBox = document.createElement("div");
-      aiBox.style.cssText = `margin-top: 25px; padding: 18px; background: rgba(255,255,255,0.15); border-radius: 12px; text-align: left; color: white;`;
-      aiBox.innerHTML = `<strong>🌟 Groq AI (Llama 3.3) Feedback:</strong><br><br>${aiText}`;
-      document.getElementById("result").appendChild(aiBox);
-    } catch (error) {
-      console.log("Groq AI error:", error);
-    }
-  }
-
-  getGroqAI();
+  alert("✅ Calculator works! Now we'll add Groq AI safely.");
 }
