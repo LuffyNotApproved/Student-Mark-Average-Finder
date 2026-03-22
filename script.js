@@ -115,5 +115,6 @@ function calculateAndShow() {
   if (typeof addGroqFeedback === "function") {
     addGroqFeedback(subjects, marks, average);
   }
+  console.log("Is addGroqFeedback available?", typeof addGroqFeedback);
 }
 }
