@@ -1,10 +1,17 @@
-// Ai.js - FIXED (Groq only, no syntax errors)
-
 async function addGroqFeedback(subjects, marks, average) {
   const resultDiv = document.getElementById("result");
   if (!resultDiv) return;
 
-  const GROQ_API_KEY = "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";
+  // Get key from localStorage (user added it)
+  const GROQ_API_KEY = localStorage.getItem("groqApiKey");
+
+  if (!GROQ_API_KEY || !GROQ_API_KEY.startsWith("gsk_")) {
+    const box = document.createElement("div");
+    box.style = "margin-top:20px; padding:15px; background:#444; border-radius:12px; color:#ffeb3b;";
+    box.innerHTML = "<strong>AI Disabled</strong><br>Paste your Groq API key above to enable real AI advice.";
+    resultDiv.appendChild(box);
+    return;
+  }
 
   try {
     const prompt = `Student marks: \( {subjects.map((s, i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis. Be encouraging.`;
@@ -26,31 +33,24 @@ async function addGroqFeedback(subjects, marks, average) {
     if (!response.ok) throw new Error(`Groq error ${response.status}`);
 
     const data = await response.json();
-    const aiText = data.choices?.[0]?.message?.content || "No advice received.";
+    const aiText = data.choices[0].message.content;
 
     const aiBox = document.createElement("div");
-    aiBox.style.cssText = `
+    aiBox.style = `
       margin-top: 25px;
       padding: 18px;
-      background: rgba(100, 255, 218, 0.2);
+      background: rgba(255, 235, 59, 0.15);
       border: 2px solid #ffeb3b;
       border-radius: 16px;
       color: #ffeb3b;
-      text-align: left;
     `;
-    aiBox.innerHTML = `<strong>🌟 Groq AI Feedback:</strong><br><br>${aiText.replace(/\n/g, "<br>")}`;
+    aiBox.innerHTML = `<strong>🌟 Groq AI Advice:</strong><br><br>${aiText.replace(/\n/g, "<br>")}`;
     resultDiv.appendChild(aiBox);
 
   } catch (error) {
-    const errorBox = document.createElement("div");
-    errorBox.style.cssText = `
-      margin-top: 20px;
-      padding: 15px;
-      background: rgba(255, 70, 70, 0.3);
-      border-radius: 12px;
-      color: #ffdddd;
-    `;
-    errorBox.innerHTML = `<strong>AI Error:</strong><br>${error.message || "Unknown error"}`;
-    resultDiv.appendChild(errorBox);
+    const box = document.createElement("div");
+    box.style = "margin-top:20px; padding:15px; background:#ff444433; border-radius:10px; color:#ffdddd;";
+    box.innerHTML = `<strong>AI Error:</strong><br>${error.message || "Unknown"}`;
+    resultDiv.appendChild(box);
   }
 }
