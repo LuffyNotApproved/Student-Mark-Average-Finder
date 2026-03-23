@@ -36,7 +36,24 @@
       <canvas id="pieChart" width="400" height="400"></canvas>
     </div>
   </div>
+  <!-- Input for Groq API key -->
+<div style="margin: 20px; text-align: center;">
+  <label for="groqKey">Paste your Groq API key to enable real AI tip:</label><br>
+  <input type="text" id="groqKey" placeholder="gsk_..." style="width: 80%; max-width: 400px; padding: 10px; margin: 10px;">
+  <button onclick="saveGroqKey()">Save Key</button>
+</div>
 
+<script>
+  function saveGroqKey() {
+    const key = document.getElementById("groqKey").value.trim();
+    if (key.startsWith("gsk_")) {
+      localStorage.setItem("groqApiKey", key);
+      alert("Key saved! It will be used for AI tips.");
+    } else {
+      alert("Invalid key – should start with gsk_");
+    }
+  }
+</script>
   <script src="script.js"></script>
   <script src="Ai.js"></script>
 </body>
