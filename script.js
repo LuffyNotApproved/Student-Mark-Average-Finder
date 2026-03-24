@@ -5,14 +5,16 @@ function saveGroqKey() {
   const key = document.getElementById("groqKey").value.trim();
   if (key && key.startsWith("gsk_")) {
     localStorage.setItem("groqApiKey", key);
-    alert("✅ Groq key saved successfully!\nIt will be used for real AI review.");
+    alert("✅ Groq key saved successfully!\nReal AI review will now be enabled.");
   } else {
     alert("❌ Invalid key. It must start with 'gsk_'");
   }
 }
 
 function generateInputs() {
-  const num = parseInt(document.getElementById("numSubjects").value);
+  const numStr = document.getElementById("numSubjects").value;
+  const num = parseInt(numStr);
+
   if (isNaN(num) || num < 1 || num > 10) {
     alert("Please enter a number between 1 and 10.");
     return;
@@ -48,7 +50,7 @@ function calculateAndShow() {
     const mark = parseFloat(markStr);
     const subName = nameInputs[i].value.trim() || `Subject ${i+1}`;
 
-    if (!markStr || isNaN(mark) || mark < 0 || mark > 100) {
+    if (markStr === "" || isNaN(mark) || mark < 0 || mark > 100) {
       valid = false;
       break;
     }
@@ -81,7 +83,6 @@ function calculateAndShow() {
   document.getElementById("result").style.display = "block";
   document.querySelector(".charts").style.display = "flex";
 
-  // Destroy old charts
   if (barChartInstance) barChartInstance.destroy();
   if (pieChartInstance) pieChartInstance.destroy();
 
@@ -105,7 +106,7 @@ function calculateAndShow() {
     }
   });
 
-  // Pie Chart below bar
+  // Pie Chart below
   const ctxPie = document.getElementById("pieChart").getContext("2d");
   pieChartInstance = new Chart(ctxPie, {
     type: "pie",
@@ -121,7 +122,7 @@ function calculateAndShow() {
     }
   });
 
-  // Real Groq AI in special box
+  // Special AI Tip Box
   const GROQ_API_KEY = localStorage.getItem("groqApiKey");
   const aiBox = document.createElement("div");
   aiBox.className = "ai-tip-box";
@@ -146,11 +147,11 @@ function calculateAndShow() {
       aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>${text.replace(/\n/g, "<br>")}`;
     })
     .catch(() => {
-      aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Unable to connect to Groq. Please check your key or try again later.`;
+      aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Unable to connect to Groq right now.<br>Please check your key or try again later.`;
     });
   } else {
-    aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Please paste your Groq API key above to get real personalised AI advice.`;
+    aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Paste your Groq API key above to get real personalised AI advice.`;
   }
 
   document.getElementById("result").appendChild(aiBox);
-}
+                    }
