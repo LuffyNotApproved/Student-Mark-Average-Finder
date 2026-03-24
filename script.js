@@ -5,9 +5,9 @@ function saveGroqKey() {
   const key = document.getElementById("groqKey").value.trim();
   if (key && key.startsWith("gsk_")) {
     localStorage.setItem("groqApiKey", key);
-    alert("Groq key saved! Real AI review will now work.");
+    alert("✅ Groq key saved successfully!\nIt will be used for real AI review.");
   } else {
-    alert("Invalid key. It must start with 'gsk_'");
+    alert("❌ Invalid key. It must start with 'gsk_'");
   }
 }
 
@@ -81,9 +81,11 @@ function calculateAndShow() {
   document.getElementById("result").style.display = "block";
   document.querySelector(".charts").style.display = "flex";
 
+  // Destroy old charts
   if (barChartInstance) barChartInstance.destroy();
   if (pieChartInstance) pieChartInstance.destroy();
 
+  // Bar Chart on top
   const ctxBar = document.getElementById("barChart").getContext("2d");
   barChartInstance = new Chart(ctxBar, {
     type: "bar",
@@ -92,8 +94,8 @@ function calculateAndShow() {
       datasets: [{
         label: "Marks",
         data: marks,
-        backgroundColor: "rgba(255, 235, 59, 0.8)",
-        borderColor: "#ffeb3b",
+        backgroundColor: "#ffeb3b",
+        borderColor: "#ffd700",
         borderWidth: 1
       }]
     },
@@ -103,6 +105,7 @@ function calculateAndShow() {
     }
   });
 
+  // Pie Chart below bar
   const ctxPie = document.getElementById("pieChart").getContext("2d");
   pieChartInstance = new Chart(ctxPie, {
     type: "pie",
@@ -110,7 +113,7 @@ function calculateAndShow() {
       labels: ["Achieved", "Remaining to 100%"],
       datasets: [{
         data: [average, 100 - average],
-        backgroundColor: ["#ffeb3b", "#333333"]
+        backgroundColor: ["#ffeb3b", "#444444"]
       }]
     },
     options: {
@@ -118,7 +121,7 @@ function calculateAndShow() {
     }
   });
 
-  // Real Groq AI review in special box
+  // Real Groq AI in special box
   const GROQ_API_KEY = localStorage.getItem("groqApiKey");
   const aiBox = document.createElement("div");
   aiBox.className = "ai-tip-box";
@@ -132,10 +135,7 @@ function calculateAndShow() {
       },
       body: JSON.stringify({
         model: "llama3-70b-8192",
-        messages: [{
-          role: "user",
-          content: `Student marks: \( {subjects.map((s,i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis.`
-        }],
+        messages: [{ role: "user", content: `Student marks: \( {subjects.map((s,i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis. Be encouraging.` }],
         temperature: 0.7,
         max_tokens: 180
       })
@@ -146,10 +146,10 @@ function calculateAndShow() {
       aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>${text.replace(/\n/g, "<br>")}`;
     })
     .catch(() => {
-      aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Unable to connect to Groq right now.<br>Try again later or check your key.`;
+      aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Unable to connect to Groq. Please check your key or try again later.`;
     });
   } else {
-    aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Paste your Groq key above to get real AI advice!`;
+    aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Please paste your Groq API key above to get real personalised AI advice.`;
   }
 
   document.getElementById("result").appendChild(aiBox);
