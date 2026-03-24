@@ -1,153 +1,129 @@
-let barChartInstance = null;
-let pieChartInstance = null;
+let barChart = null;
+let pieChart = null;
 
 function saveGroqKey() {
-  const key = document.getElementById("groqKey").value.trim();
-  if (key && key.startsWith("gsk_")) {
-    localStorage.setItem("groqApiKey", key);
-    alert("✅ Groq key saved successfully!\nReal AI review will now be enabled.");
+  var key = document.getElementById("groqKey").value;
+  if (key.length > 10 && key.indexOf("gsk_") === 0) {
+    localStorage.setItem("groqKey", key);
+    alert("Key saved successfully! AI review is now active.");
   } else {
-    alert("❌ Invalid key. It must start with 'gsk_'");
+    alert("Please enter a valid Groq key starting with gsk_");
   }
 }
 
-function generateInputs() {
-  const num = parseInt(document.getElementById("numSubjects").value);
-  if (isNaN(num) || num < 1 || num > 10) {
-    alert("Please enter a number between 1 and 10.");
+function createInputs() {
+  var countStr = document.getElementById("numSub").value;
+  var count = Number(countStr);
+
+  if (count < 1 || count > 10) {
+    alert("Please enter a number between 1 and 10");
     return;
   }
 
-  const container = document.getElementById("subjectsContainer");
-  container.innerHTML = "";
+  var area = document.getElementById("inputBox");
+  area.innerHTML = "";
 
-  for (let i = 1; i <= num; i++) {
-    const div = document.createElement("div");
-    div.className = "subject-row";
+  for (var i = 1; i <= count; i++) {
+    var div = document.createElement("div");
     div.innerHTML = `
-      <input type="text" placeholder="Subject ${i} name" class="sub-name" />
-      <input type="number" placeholder="Marks (0-100)" class="sub-marks" min="0" max="100" />
+      <input type="text" placeholder="Subject ` + i + `" class="subj">
+      <input type="number" placeholder="Marks" min="0" max="100" class="mrk">
     `;
-    container.appendChild(div);
+    area.appendChild(div);
   }
 
-  document.getElementById("calculateBtn").style.display = "inline-block";
+  document.getElementById("calcButton").style.display = "inline-block";
 }
 
-function calculateAndShow() {
-  const nameInputs = document.querySelectorAll(".sub-name");
-  const markInputs = document.querySelectorAll(".sub-marks");
+function doCalculation() {
+  var subjInputs = document.querySelectorAll(".subj");
+  var markInputs = document.querySelectorAll(".mrk");
 
-  const subjects = [];
-  const marks = [];
-  let total = 0;
-  let valid = true;
+  var subjects = [];
+  var marks = [];
+  var total = 0;
 
-  for (let i = 0; i < markInputs.length; i++) {
-    const markStr = markInputs[i].value.trim();
-    const mark = parseFloat(markStr);
-    const subName = nameInputs[i].value.trim() || `Subject ${i+1}`;
+  for (var i = 0; i < markInputs.length; i++) {
+    var m = Number(markInputs[i].value);
+    var name = subjInputs[i].value.trim();
+    if (name === "") name = "Subject " + (i+1);
 
-    if (markStr === "" || isNaN(mark) || mark < 0 || mark > 100) {
-      valid = false;
-      break;
+    if (m < 0 || m > 100) {
+      alert("All marks must be between 0 and 100");
+      return;
     }
 
-    subjects.push(subName);
-    marks.push(mark);
-    total += mark;
+    subjects.push(name);
+    marks.push(m);
+    total = total + m;
   }
 
-  if (!valid || marks.length === 0) {
-    alert("Please fill all marks correctly (0–100).");
-    return;
-  }
+  var avg = total / marks.length;
 
-  const count = marks.length;
-  const average = total / count;
+  var grade = "";
+  if (avg >= 90) grade = "Outstanding! 🌟";
+  else if (avg >= 80) grade = "Very Good! 👍";
+  else if (avg >= 70) grade = "Good 👌";
+  else if (avg >= 60) grade = "Average";
+  else if (avg >= 50) grade = "Needs Improvement ⚠️";
+  else grade = "Requires serious effort ❗";
 
-  let message = "";
-  if (average >= 90) message = "Outstanding! 🌟";
-  else if (average >= 80) message = "Very Good! 👍";
-  else if (average >= 70) message = "Good 👌";
-  else if (average >= 60) message = "Average";
-  else if (average >= 50) message = "Needs Improvement ⚠️";
-  else message = "Requires serious effort ❗";
+  document.getElementById("infoArea").innerHTML = `
+    Total Subjects: ` + marks.length + `<br>
+    Total Marks: ` + total.toFixed(1) + `<br>
+    Average: ` + avg.toFixed(2) + `%<br>
+    <strong>` + grade + `</strong>
+  `;
 
-  document.getElementById("summary").innerHTML = 
-    `Total subjects: ${count}<br>Total marks: ${total.toFixed(1)}<br>Average: ${average.toFixed(2)}%`;
-  document.getElementById("performance").innerHTML = message;
+  document.getElementById("showArea").style.display = "block";
 
-  document.getElementById("result").style.display = "block";
-  document.querySelector(".charts").style.display = "flex";
+  // Charts
+  if (barChart) barChart.destroy();
+  if (pieChart) pieChart.destroy();
 
-  if (barChartInstance) barChartInstance.destroy();
-  if (pieChartInstance) pieChartInstance.destroy();
-
-  const ctxBar = document.getElementById("barChart").getContext("2d");
-  barChartInstance = new Chart(ctxBar, {
+  barChart = new Chart(document.getElementById("barCanvas"), {
     type: "bar",
     data: {
       labels: subjects,
-      datasets: [{
-        label: "Marks",
-        data: marks,
-        backgroundColor: "#ffeb3b",
-        borderColor: "#ffd700",
-        borderWidth: 1
-      }]
+      datasets: [{ label: "Marks", data: marks, backgroundColor: "#ffeb3b" }]
     },
-    options: {
-      scales: { y: { beginAtZero: true, max: 100 } },
-      plugins: { title: { display: true, text: "Subject-wise Marks" } }
-    }
+    options: { scales: { y: { beginAtZero: true, max: 100 } } }
   });
 
-  const ctxPie = document.getElementById("pieChart").getContext("2d");
-  pieChartInstance = new Chart(ctxPie, {
+  pieChart = new Chart(document.getElementById("pieCanvas"), {
     type: "pie",
     data: {
-      labels: ["Achieved", "Remaining to 100%"],
-      datasets: [{
-        data: [average, 100 - average],
-        backgroundColor: ["#ffeb3b", "#444444"]
-      }]
-    },
-    options: {
-      plugins: { title: { display: true, text: `Overall Performance (${average.toFixed(1)}%)` } }
+      labels: ["Achieved", "Remaining"],
+      datasets: [{ data: [avg, 100 - avg], backgroundColor: ["#ffeb3b", "#444"] }]
     }
   });
 
-  // Special AI Tip Box
-  const GROQ_API_KEY = localStorage.getItem("groqApiKey");
-  const aiBox = document.createElement("div");
-  aiBox.className = "ai-tip-box";
+  // AI Box
+  var savedKey = localStorage.getItem("groqKey");
+  var box = document.getElementById("aiArea");
 
-  if (GROQ_API_KEY && GROQ_API_KEY.startsWith("gsk_")) {
+  if (savedKey && savedKey.indexOf("gsk_") === 0) {
     fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Authorization": "Bearer " + savedKey,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "llama3-70b-8192",
-        messages: [{ role: "user", content: `Student marks: \( {subjects.map((s,i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis. Be encouraging.` }],
+        messages: [{ role: "user", content: "Student marks: " + subjects.map(function(s,i){return s + ":" + marks[i];}).join(", ") + ". Average: " + avg.toFixed(1) + "%. Give short motivational advice with emojis." }],
         temperature: 0.7,
-        max_tokens: 180
+        max_tokens: 150
       })
     })
-    .then(res => res.json())
-    .then(data => {
-      const text = data.choices[0].message.content;
-      aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>${text.replace(/\n/g, "<br>")}`;
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      box.innerHTML = "<strong>🌟 Groq AI Review:</strong><br><br>" + d.choices[0].message.content.replace(/\n/g, "<br>");
     })
-    .catch(() => {
-      aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Unable to connect to Groq right now.<br>Please check your key or try again later.`;
+    .catch(function() {
+      box.innerHTML = "<strong>🌟 Groq AI Review:</strong><br><br>Unable to connect to Groq. Please check your key.";
     });
   } else {
-    aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Paste your Groq API key above to get real personalised AI advice.`;
+    box.innerHTML = "<strong>🌟 Groq AI Review:</strong><br><br>Paste your Groq key above to get real AI advice.";
   }
-
-  document.getElementById("result").appendChild(aiBox);
 }
