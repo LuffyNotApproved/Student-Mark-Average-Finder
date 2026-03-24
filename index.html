@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Marks Analyzer</title>
-  <link rel="stylesheet" href="style.css"/>
-  <!-- Chart.js CDN -->
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
     <h1>Student Marks Analyzer</h1>
-    <p>Enter your subjects and marks to see your average & performance visuals</p>
+    <p>Enter your subjects and marks to get average + real Groq AI review</p>
+
+    <!-- Groq Key Input (secure) -->
+    <div class="key-input">
+      <label for="groqKey">Paste your Groq API key to enable real AI review:</label>
+      <input type="text" id="groqKey" placeholder="gsk_xxxxxxxxxxxx">
+      <button onclick="saveGroqKey()">Save Key</button>
+    </div>
 
     <div class="input-section">
       <label>How many subjects? </label>
-      <input type="number" id="numSubjects" min="1" max="10" value="5"/>
+      <input type="number" id="numSubjects" min="1" max="10" value="5">
       <button onclick="generateInputs()">Set Subjects</button>
     </div>
 
@@ -32,29 +38,11 @@
     </div>
 
     <div class="charts" style="display:none;">
-      <canvas id="barChart" width="400" height="200"></canvas>
+      <canvas id="barChart" width="400" height="250"></canvas>
       <canvas id="pieChart" width="400" height="400"></canvas>
     </div>
   </div>
-  <!-- Input for Groq API key -->
-<div style="margin: 20px; text-align: center;">
-  <label for="groqKey">Paste your Groq API key to enable real AI tip:</label><br>
-  <input type="text" id="groqKey" placeholder="gsk_..." style="width: 80%; max-width: 400px; padding: 10px; margin: 10px;">
-  <button onclick="saveGroqKey()">Save Key</button>
-</div>
 
-<script>
-  function saveGroqKey() {
-    const key = document.getElementById("groqKey").value.trim();
-    if (key.startsWith("gsk_")) {
-      localStorage.setItem("groqApiKey", key);
-      alert("Key saved! It will be used for AI tips.");
-    } else {
-      alert("Invalid key – should start with gsk_");
-    }
-  }
-</script>
   <script src="script.js"></script>
-  <script src="Ai.js"></script>
 </body>
 </html>
