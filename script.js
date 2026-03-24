@@ -1,8 +1,15 @@
-console.log("script.js fully executed – functions should be available now");
-// alert("script.js loaded and ran successfully!"); // ← uncomment if you want a popup on load
-
 let barChartInstance = null;
 let pieChartInstance = null;
+
+function saveGroqKey() {
+  const key = document.getElementById("groqKey").value.trim();
+  if (key && key.startsWith("gsk_")) {
+    localStorage.setItem("groqApiKey", key);
+    alert("Groq key saved! Real AI review will now work.");
+  } else {
+    alert("Invalid key. It must start with 'gsk_'");
+  }
+}
 
 function generateInputs() {
   const num = parseInt(document.getElementById("numSubjects").value);
@@ -85,8 +92,8 @@ function calculateAndShow() {
       datasets: [{
         label: "Marks",
         data: marks,
-        backgroundColor: "rgba(75, 192, 192, 0.7)",
-        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(255, 235, 59, 0.8)",
+        borderColor: "#ffeb3b",
         borderWidth: 1
       }]
     },
@@ -103,11 +110,47 @@ function calculateAndShow() {
       labels: ["Achieved", "Remaining to 100%"],
       datasets: [{
         data: [average, 100 - average],
-        backgroundColor: ["#36A2EB", "#FF6384"]
+        backgroundColor: ["#ffeb3b", "#333333"]
       }]
     },
     options: {
       plugins: { title: { display: true, text: `Overall Performance (${average.toFixed(1)}%)` } }
     }
   });
+
+  // Real Groq AI review in special box
+  const GROQ_API_KEY = localStorage.getItem("groqApiKey");
+  const aiBox = document.createElement("div");
+  aiBox.className = "ai-tip-box";
+
+  if (GROQ_API_KEY && GROQ_API_KEY.startsWith("gsk_")) {
+    fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama3-70b-8192",
+        messages: [{
+          role: "user",
+          content: `Student marks: \( {subjects.map((s,i) => ` \){s}: ${marks[i]}`).join(", ")}. Average: ${average.toFixed(1)}%. Give short, motivational, personalised study advice in 4-5 lines. Use emojis.`
+        }],
+        temperature: 0.7,
+        max_tokens: 180
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      const text = data.choices[0].message.content;
+      aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>${text.replace(/\n/g, "<br>")}`;
+    })
+    .catch(() => {
+      aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Unable to connect to Groq right now.<br>Try again later or check your key.`;
+    });
+  } else {
+    aiBox.innerHTML = `<strong>🌟 Groq AI Review:</strong><br><br>Paste your Groq key above to get real AI advice!`;
+  }
+
+  document.getElementById("result").appendChild(aiBox);
 }
