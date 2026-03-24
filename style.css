@@ -1,4 +1,8 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
   background: #0a0a0a;
@@ -36,9 +40,9 @@ input[type="text"], input[type="number"] {
   border: 1px solid #444;
   padding: 12px;
   border-radius: 8px;
-  width: 80%;
-  max-width: 400px;
-  margin: 10px;
+  margin: 8px;
+  flex: 1;
+  min-width: 160px;
 }
 
 button {
@@ -49,7 +53,6 @@ button {
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
 }
 
 button:hover {
@@ -62,16 +65,31 @@ button:hover {
   gap: 15px;
   flex-wrap: wrap;
   justify-content: center;
-  margin: 15px 0;
+  margin: 12px 0;
 }
 
 .result-section, .charts {
   margin-top: 30px;
 }
 
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+
+.charts canvas {
+  max-width: 85%;
+  height: auto !important;
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 15px;
+}
+
 .ai-tip-box {
-  margin: 30px auto;
-  max-width: 700px;
+  margin: 35px auto;
+  max-width: 720px;
   padding: 25px;
   background: #1a1a00;
   border: 3px solid #ffeb3b;
@@ -80,13 +98,4 @@ button:hover {
   color: #ffeb3b;
   text-align: center;
   font-size: 1.1rem;
-}
-
-.charts canvas {
-  max-width: 95%;
-  margin: 20px auto;
-  display: block;
-  background: #1a1a1a;
-  border-radius: 12px;
-  padding: 15px;
 }
