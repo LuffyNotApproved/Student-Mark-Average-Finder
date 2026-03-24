@@ -1,8 +1,4 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   background: #0a0a0a;
@@ -41,8 +37,6 @@ input[type="text"], input[type="number"] {
   padding: 12px;
   border-radius: 8px;
   margin: 8px;
-  flex: 1;
-  min-width: 160px;
 }
 
 button {
@@ -60,12 +54,18 @@ button:hover {
   transform: scale(1.05);
 }
 
+/* Subject and Marks side by side */
 .subject-row {
   display: flex;
   gap: 15px;
   flex-wrap: wrap;
   justify-content: center;
   margin: 12px 0;
+}
+
+.subject-row input {
+  flex: 1;
+  min-width: 160px;
 }
 
 .result-section, .charts {
