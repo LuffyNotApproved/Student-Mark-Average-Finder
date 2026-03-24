@@ -12,9 +12,7 @@ function saveGroqKey() {
 }
 
 function generateInputs() {
-  const numStr = document.getElementById("numSubjects").value;
-  const num = parseInt(numStr);
-
+  const num = parseInt(document.getElementById("numSubjects").value);
   if (isNaN(num) || num < 1 || num > 10) {
     alert("Please enter a number between 1 and 10.");
     return;
@@ -86,7 +84,6 @@ function calculateAndShow() {
   if (barChartInstance) barChartInstance.destroy();
   if (pieChartInstance) pieChartInstance.destroy();
 
-  // Bar Chart on top
   const ctxBar = document.getElementById("barChart").getContext("2d");
   barChartInstance = new Chart(ctxBar, {
     type: "bar",
@@ -106,7 +103,6 @@ function calculateAndShow() {
     }
   });
 
-  // Pie Chart below
   const ctxPie = document.getElementById("pieChart").getContext("2d");
   pieChartInstance = new Chart(ctxPie, {
     type: "pie",
@@ -154,4 +150,4 @@ function calculateAndShow() {
   }
 
   document.getElementById("result").appendChild(aiBox);
-                    }
+}
