@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import SourceCodeViewer from "./SourceCodeViewer";
 import {
   BarChart,
   Bar,
@@ -55,7 +54,6 @@ export default function MarksAnalyzer() {
   const [numSubjects, setNumSubjects] = useState<string>("3");
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [showSubjectInputs, setShowSubjectInputs] = useState(false);
-  const [showSource, setShowSource] = useState(false);
 
   const [results, setResults] = useState<{
     total: number;
@@ -438,42 +436,6 @@ export default function MarksAnalyzer() {
             </div>
           </>
         )}
-
-        {/* Source Code Button */}
-        <div className="text-center pb-6">
-          <button
-            onClick={() => setShowSource(true)}
-            style={{
-              background: "transparent",
-              border: `1px solid #333`,
-              borderRadius: 8,
-              color: "#888",
-              padding: "7px 18px",
-              cursor: "pointer",
-              fontSize: 13,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 7,
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = YELLOW;
-              (e.currentTarget as HTMLButtonElement).style.color = YELLOW;
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "#333";
-              (e.currentTarget as HTMLButtonElement).style.color = "#888";
-            }}
-          >
-            🗂️ View Source Code
-          </button>
-          <p className="text-center text-xs mt-3" style={{ color: "#3a3a2a" }}>
-            Student Marks Analyzer &mdash; All data stays in your browser
-          </p>
-        </div>
-      </div>
-
-      {showSource && <SourceCodeViewer onClose={() => setShowSource(false)} />}
     </div>
   );
 }
