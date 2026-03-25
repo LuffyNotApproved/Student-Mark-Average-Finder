@@ -1,0 +1,13 @@
+import { Router } from "express";
+
+import healthRouter from "./health";
+import reviewRouter from "./review";
+import sourceRouter from "./source";
+
+const router = Router();
+
+router.use(healthRouter);
+router.use(reviewRouter);
+router.use(sourceRouter);
+
+export default router;
