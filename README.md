@@ -1,21 +1,20 @@
-# AI Student Review Backend
+# Student Mark Average Finder
 
-An Express.js + TypeScript backend that generates personalized motivational reviews for students using OpenAI.
+A web app where students enter subject names and marks, then get:
+- Total marks & average
+- Grade (A+, A, B+, B, C, D, F)
+- Bar chart & pie chart of performance
+- AI-generated motivational study review (no API key needed)
+
+## Structure
+
+- `frontend/` — React + Vite app (dark theme, yellow accents, recharts)
+- `backend/` — Express API server (AI review endpoint via Replit AI Integration)
 
 ## Features
-- AI-powered motivational study reviews
-- Clean modular route structure
-- TypeScript support
 
-## Tech Stack
-- Node.js
-- Express
-- TypeScript
-- OpenAI GPT-4o-mini
-
-## Setup
-
-1. Clone the repo
-2. Install dependencies:
-   ```bash
-   npm install
+- Enter any number of subjects with marks out of 100
+- Visual charts (bar + pie) using Recharts
+- AI-powered personalised study review
+- View source code panel with copy-to-clipboard
+- 🇵🇱 Polska Krowa
