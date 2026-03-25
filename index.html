@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Marks Analyzer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: #0a0a0a;
+        color: #f9f6e0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        min-height: 100vh;
+      }
+      .container { max-width: 720px; margin: 0 auto; padding: 32px 16px; }
+
+      /* Header */
+      .header { text-align: center; margin-bottom: 32px; }
+      .header h1 { font-size: 2.2rem; font-weight: 800; color: #ffeb3b; }
+      .header p  { color: #a89f6a; font-size: 0.9rem; margin-top: 6px; }
+      .cow-img {
+        width: 150px; border-radius: 12px; margin: 14px 0 6px;
+        border: 2px solid #ffeb3b44;
+        box-shadow: 0 0 16px #ffeb3b22;
+      }
+      .polska { font-size: 0.75rem; font-weight: 700; color: #ffeb3b99; letter-spacing: 0.1em; }
+
+      /* Cards */
+      .card {
+        background: #161616;
+        border: 1px solid #2a2a2a;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .card-title { color: #ffeb3b; font-weight: 700; margin-bottom: 14px; font-size: 0.95rem; }
+
+      /* Inputs */
+      label.lbl { display: block; color: #ffeb3b; font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; }
+      input[type="text"], input[type="number"] {
+        background: #0f0f0f;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        color: #f9f6e0;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        outline: none;
+        width: 100%;
+        transition: border-color 0.2s;
+      }
+      input[type="text"]:focus, input[type="number"]:focus { border-color: #ffeb3b; }
+
+      .row { display: flex; gap: 10px; align-items: center; }
+      .row input { flex: 0 0 100px; }
+
+      /* Buttons */
+      .btn {
+        background: #ffeb3b;
+        color: #111;
+        border: none;
+        border-radius: 8px;
+        padding: 9px 20px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: opacity 0.15s;
+        white-space: nowrap;
+      }
+      .btn:hover { opacity: 0.85; }
+      .btn-full { width: 100%; padding: 11px; font-size: 1rem; border-radius: 10px; }
+
+      /* Subject rows */
+      .subject-row { display: flex; gap: 10px; margin-bottom: 10px; }
+      .subject-row input:first-child { flex: 1; }
+      .subject-row input:last-child  { flex: 0 0 110px; }
+
+      /* Summary cards */
+      .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+      .summary-card {
+        background: #161616;
+        border: 1px solid #2a2a2a;
+        border-radius: 14px;
+        padding: 16px;
+        text-align: center;
+      }
+      .summary-label { color: #a89f6a; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 6px; }
+      .summary-value { color: #ffeb3b; font-size: 1.6rem; font-weight: 800; }
+
+      /* Performance message */
+      .perf-msg {
+        background: #161616;
+        border: 1px solid #2a2a2a;
+        border-left: 4px solid #ffeb3b;
+        border-radius: 12px;
+        padding: 14px 18px;
+        color: #c8bf80;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      /* Charts */
+      .chart-wrap { position: relative; width: 100%; max-height: 320px; }
+
+      /* Subject table */
+      .subject-table { width: 100%; border-collapse: collapse; }
+      .subject-table th { color: #a89f6a; font-size: 0.75rem; text-transform: uppercase; padding: 6px 10px; text-align: left; border-bottom: 1px solid #2a2a2a; }
+      .subject-table td { padding: 8px 10px; border-bottom: 1px solid #1a1a1a; font-size: 0.88rem; }
+      .subject-table td:last-child { text-align: right; font-weight: 600; }
+      .mark-bar { height: 6px; background: #ffeb3b; border-radius: 3px; margin-top: 4px; }
+
+      /* Footer */
+      .footer { text-align: center; color: #2a2a2a; font-size: 0.78rem; padding: 16px 0 8px; }
+    </style>
+  </head>
+  <body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <h1>Student Marks Analyzer</h1>
+      <p>Enter your subject marks, get charts &amp; a grade summary</p>
+      <br/>
+      <img class="cow-img"
+        src="https://raw.githubusercontent.com/LuffyNotApproved/Student-Mark-Average-Finder/main/frontend/public/polish-cow.gif"
+        alt="Polish Cow" />
+      <div class="polska">🇵🇱 POLSKA KROWA 🇵🇱</div>
+    </div>
+
+    <!-- Step 1: number of subjects -->
+    <div class="card" id="setup-card">
+      <label class="lbl">How many subjects?</label>
+      <div class="row">
+        <input type="number" id="num-subjects" value="3" min="1" max="20" style="flex:0 0 100px" />
+        <button class="btn" onclick="setSubjects()">Set Subjects</button>
+      </div>
+    </div>
+
+    <!-- Step 2: enter subject names + marks -->
+    <div class="card" id="inputs-card" style="display:none">
+      <label class="lbl">Enter subject names &amp; marks</label>
+      <div id="subject-inputs"></div>
+      <br/>
+      <button class="btn btn-full" onclick="calculate()">Calculate Results</button>
+    </div>
+
+    <!-- Step 3: results -->
+    <div id="results-section" style="display:none">
+
+      <!-- Summary cards -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-label">Total</div>
+          <div class="summary-value" id="val-total">—</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Average</div>
+          <div class="summary-value" id="val-avg">—</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Grade</div>
+          <div class="summary-value" id="val-grade">—</div>
+        </div>
+      </div>
+
+      <!-- Performance message -->
+      <div class="perf-msg" id="perf-msg"></div>
+
+      <!-- Subject breakdown table -->
+      <div class="card">
+        <div class="card-title">Subject Breakdown</div>
+        <table class="subject-table">
+          <thead><tr><th>Subject</th><th style="text-align:right">Mark</th></tr></thead>
+          <tbody id="subject-table-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Bar chart -->
+      <div class="card">
+        <div class="card-title">Marks by Subject</div>
+        <div class="chart-wrap"><canvas id="bar-chart"></canvas></div>
+      </div>
+
+      <!-- Pie chart -->
+      <div class="card">
+        <div class="card-title">Mark Distribution</div>
+        <div class="chart-wrap"><canvas id="pie-chart"></canvas></div>
+      </div>
+
+      <!-- Reset -->
+      <div style="text-align:center; margin-bottom: 24px">
+        <button class="btn" onclick="reset()" style="background:transparent;border:1px solid #333;color:#888;padding:7px 20px">
+          ↺ Start Over
+        </button>
+      </div>
+    </div>
+
+    <div class="footer">Student Marks Analyzer &mdash; calculator.py logic &bull; All data stays in your browser</div>
+  </div>
+
+  <script>
+    // ============================================================
+    // CALCULATION FUNCTIONS — mirrors the logic in calculator.py
+    // ============================================================
+
+    // Same as Python: def get_grade(average)
+    function getGrade(average) {
+      if (average >= 90) return "A+";
+      if (average >= 80) return "A";
+      if (average >= 70) return "B+";
+      if (average >= 60) return "B";
+      if (average >= 50) return "C";
+      if (average >= 40) return "D";
+      return "F";
+    }
+
+    // Same as Python: def calculate_total(marks)
+    function calculateTotal(marks) {
+      let total = 0;
+      for (let i = 0; i < marks.length; i++) {
+        total = total + marks[i];
+      }
+      return total;
+    }
+
+    // Same as Python: def calculate_average(marks)
+    function calculateAverage(marks) {
+      return calculateTotal(marks) / marks.length;
+    }
+
+    // Same as Python: def get_performance_message(average)
+    function getPerformanceMessage(average) {
+      if (average >= 90) return "Outstanding! You are at the top of your class!";
+      if (average >= 75) return "Great work! You are performing well above average.";
+      if (average >= 60) return "Good effort! There is room to push even higher.";
+      if (average >= 45) return "You are getting there. A bit more focus will make a big difference.";
+      return "Don't give up! With dedicated study you can turn this around.";
+    }
+
+    // Same as Python: def analyze_subjects(subjects, marks)
+    function analyzeSubjects(subjects, marks) {
+      const total   = calculateTotal(marks);
+      const average = calculateAverage(marks);
+      const grade   = getGrade(average);
+      return { total, average, grade };
+    }
+
+    // ============================================================
+    // CHART COLOURS
+    // ============================================================
+    const COLORS = [
+      "#ffeb3b","#ff9800","#4caf50","#2196f3",
+      "#e91e63","#9c27b0","#00bcd4","#ff5722","#8bc34a","#795548"
+    ];
+
+    let barChart = null;
+    let pieChart = null;
+
+    // ============================================================
+    // UI FUNCTIONS
+    // ============================================================
+
+    function setSubjects() {
+      const n = parseInt(document.getElementById("num-subjects").value);
+      if (isNaN(n) || n < 1 || n > 20) {
+        alert("Please enter a number between 1 and 20.");
+        return;
+      }
+
+      const container = document.getElementById("subject-inputs");
+      container.innerHTML = "";
+
+      for (let i = 0; i < n; i++) {
+        const row = document.createElement("div");
+        row.className = "subject-row";
+        row.innerHTML =
+          '<input type="text"   placeholder="Subject ' + (i + 1) + '" id="subj-' + i + '" />' +
+          '<input type="number" placeholder="Mark (0–100)" id="mark-' + i + '" min="0" max="100" />';
+        container.appendChild(row);
+      }
+
+      document.getElementById("inputs-card").style.display = "block";
+      document.getElementById("results-section").style.display = "none";
+      document.getElementById("inputs-card").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function calculate() {
+      const rows = document.querySelectorAll(".subject-row");
+      const subjects = [];
+      const marks    = [];
+
+      for (let i = 0; i < rows.length; i++) {
+        const name = document.getElementById("subj-" + i).value.trim() || ("Subject " + (i + 1));
+        const mark = parseInt(document.getElementById("mark-" + i).value);
+
+        if (isNaN(mark) || mark < 0 || mark > 100) {
+          alert("Please enter a valid mark (0–100) for: " + name);
+          return;
+        }
+        subjects.push(name);
+        marks.push(mark);
+      }
+
+      // Run the analysis (same logic as calculator.py)
+      const result = analyzeSubjects(subjects, marks);
+
+      // Update summary cards
+      document.getElementById("val-total").textContent = result.total + "/" + (rows.length * 100);
+      document.getElementById("val-avg").textContent   = result.average.toFixed(1) + "%";
+      document.getElementById("val-grade").textContent = result.grade;
+
+      // Performance message
+      document.getElementById("perf-msg").textContent = getPerformanceMessage(result.average);
+
+      // Subject table
+      const tbody = document.getElementById("subject-table-body");
+      tbody.innerHTML = "";
+      for (let i = 0; i < subjects.length; i++) {
+        const pct = marks[i];
+        const tr  = document.createElement("tr");
+        tr.innerHTML =
+          "<td>" + subjects[i] +
+            "<div class='mark-bar' style='width:" + pct + "%'></div></td>" +
+          "<td>" + marks[i] + "/100</td>";
+        tbody.appendChild(tr);
+      }
+
+      // Charts
+      renderCharts(subjects, marks);
+
+      document.getElementById("results-section").style.display = "block";
+      document.getElementById("results-section").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function renderCharts(subjects, marks) {
+      const barColors = COLORS.slice(0, marks.length);
+
+      if (barChart) barChart.destroy();
+      barChart = new Chart(document.getElementById("bar-chart"), {
+        type: "bar",
+        data: {
+          labels: subjects,
+          datasets: [{
+            label: "Marks",
+            data: marks,
+            backgroundColor: barColors,
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              min: 0, max: 100,
+              grid: { color: "#1e1e1e" },
+              ticks: { color: "#a89f6a" }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: "#a89f6a" }
+            }
+          }
+        }
+      });
+
+      if (pieChart) pieChart.destroy();
+      pieChart = new Chart(document.getElementById("pie-chart"), {
+        type: "pie",
+        data: {
+          labels: subjects,
+          datasets: [{
+            data: marks,
+            backgroundColor: barColors,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: "#a89f6a" } }
+          }
+        }
+      });
+    }
+
+    function reset() {
+      document.getElementById("results-section").style.display = "none";
+      document.getElementById("inputs-card").style.display     = "none";
+      document.getElementById("setup-card").scrollIntoView({ behavior: "smooth" });
+    }
+  </script>
+  </body>
+  </html>
