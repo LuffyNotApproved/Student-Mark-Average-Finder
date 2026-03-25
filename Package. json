@@ -1,0 +1,20 @@
+{
+  "name": "ai-student-review-backend",
+  "version": "1.0.0",
+  "description": "Express TypeScript backend with OpenAI student review",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.ts"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "@workspace/integrations-openai-ai-server": "latest"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0"
+  }
+}
